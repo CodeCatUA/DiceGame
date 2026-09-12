@@ -26,6 +26,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
+    private long lastShakeTime = 0;
+    private boolean isShaking = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,9 +95,33 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return;
         }
 
-        tvX.setText("" + event.values[0]);
-        tvY.setText("" + event.values[1]);
-        tvZ.setText("" + event.values[2]);
+        double x = event.values[0];
+        double y = event.values[1];
+        double z = event.values[2];
 
+        double acceleration = Math.sqrt(x*x + y*y + z*z);
+
+        if (acceleration > 15){
+            lastShakeTime = System.currentTimeMillis();
+
+            if (!isShaking){
+                isShaking=true;
+                tvStatus.setText("Трясіть телефон!");
+
+                tvDice1.setText("Кубик 1 = ?");
+                tvDice2.setText("Кубик 2 = ?");
+                tvSum.setText("Сума - ?");
+
+
+            }
+        }
+
+        if (isShaking){
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastShakeTime > 500){
+                isShaking = false;
+                rollDice();
+            }
+        }
     }
 }
