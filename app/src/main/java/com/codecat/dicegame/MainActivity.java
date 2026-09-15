@@ -19,12 +19,15 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity implements SensorEventListener{
 
     Button btnShake;
-    TextView tvDice1, tvDice2, tvSum, tvStatus, tvX, tvY, tvZ;
+    TextView tvDice1, tvDice2, tvSum, tvStatus, tvX, tvY, tvZ, tvGyroscope, tvMagnetic, tvLight;
 
     private Random random = new Random();
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
+    private Sensor light;
+    private Sensor gyroscope;
+    private Sensor magnetic;
 
     private long lastShakeTime = 0;
     private boolean isShaking = false;
@@ -49,12 +52,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         tvX = findViewById(R.id.tvX);
         tvY = findViewById(R.id.tvY);
         tvZ = findViewById(R.id.tvZ);
+        tvGyroscope = findViewById(R.id.tvGyroscope);
+        tvLight = findViewById(R.id.tvLight);
+        tvMagnetic = findViewById(R.id.tvMagnetic);
 
         btnShake = findViewById(R.id.btnShake);
         btnShake.setOnClickListener(v -> rollDice());
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        magnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
     }
 
     @Override
@@ -63,6 +72,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (accelerometer != null){
             sensorManager.registerListener( this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         }
+        if (gyroscope != null){
+            sensorManager.registerListener(this,gyroscope, SensorManager.SENSOR_DELAY_UI);
+        }
+        if (magnetic != null){
+            sensorManager.registerListener(this, magnetic, SensorManager.SENSOR_DELAY_UI);
+        }
+        if (light != null){
+            sensorManager.registerListener(this, light, SensorManager.SENSOR_DELAY_UI);
+        }
     }
 
     @Override
@@ -70,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onPause();
 
         sensorManager.unregisterListener(this);
+
     }
 
     private void rollDice() {
@@ -91,9 +110,45 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER){
-            return;
+
+
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+            updateAccelerometer(event);
         }
+        if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE){
+            updateGyroscope(event);
+        }
+        if (event.sensor.getType() == Sensor.TYPE_LIGHT){
+     //       updateLight(event);
+        }
+        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
+            updateMagneticField(event);
+        }
+
+    }
+
+    private void updateMagneticField(SensorEvent event) {
+        double x = event.values[0];
+        double y = event.values[1];
+        double z = event.values[2];
+
+        tvMagnetic.setText("Магнітометр: x = " + x + "; y = " + y + "; z = " + z);
+    }
+
+    private void updateLight(SensorEvent event) {
+        double light = event.values[0];
+        tvLight.setText("Освітленість: " + light);
+    }
+
+    private void updateGyroscope(SensorEvent event) {
+        double x = event.values[0];
+        double y = event.values[1];
+        double z = event.values[2];
+
+        tvGyroscope.setText("Гіроскоп: x = " + x + "; y = " + y + "; z = " + z);
+    }
+
+    private void updateAccelerometer(SensorEvent event) {
 
         double x = event.values[0];
         double y = event.values[1];
