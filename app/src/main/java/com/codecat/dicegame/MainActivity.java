@@ -6,6 +6,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private Random random = new Random();
 
+    private Dice dice1, dice2;
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private Sensor light;
@@ -55,6 +57,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         tvGyroscope = findViewById(R.id.tvGyroscope);
         tvLight = findViewById(R.id.tvLight);
         tvMagnetic = findViewById(R.id.tvMagnetic);
+
+        ImageView diceImage1 = findViewById(R.id.diceImage1);
+        ImageView diceImage2 = findViewById(R.id.diceImage2);
+        diceImage1.setTranslationX(-100);
+        diceImage2.setTranslationX(100);
+
+        int[] faces = {R.drawable.dice_1,
+                R.drawable.dice_2,
+                R.drawable.dice_3,
+                R.drawable.dice_4,
+                R.drawable.dice_5,
+                R.drawable.dice_6};
+
+        int[] rollFrames = {R.drawable.dice_roll_1,
+                R.drawable.dice_roll_2,
+                R.drawable.dice_roll_3,
+                R.drawable.dice_roll_4,
+                R.drawable.dice_roll_5,
+                R.drawable.dice_roll_6};
 
         btnShake = findViewById(R.id.btnShake);
         btnShake.setOnClickListener(v -> rollDice());
